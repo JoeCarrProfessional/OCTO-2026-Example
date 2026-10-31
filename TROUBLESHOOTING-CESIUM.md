@@ -69,16 +69,17 @@ Loaded 3000+ satellites
    - Reload page
    - Look for red X on any requests
    - If jsDelivr CDN has red X → internet/firewall issue
-   - If app.js has red X → might be in wrong folder
+   - If `assets/index-*.js` has red X → Vite `base` or Pages path problem
 
 2. **Verify file structure**
    Make sure you have:
    ```
    your-repo/
    ├── index.html
-   ├── styles.css
-   ├── app.js
-   └── .gitignore (optional)
+   ├── package.json
+   ├── vite.config.js
+   ├── src/
+   └── .github/workflows/deploy.yml
    ```
 
 3. **Check GitHub Pages deployment**
@@ -144,7 +145,7 @@ If jsDelivr is blocked in your region, try one of these:
 
 If you're building your own project based on this example:
 
-1. **Copy the loading check** from app.js (lines 1-5)
+1. **Copy the viewer setup** from `src/globe/SatelliteGlobe.jsx` (it checks `window.Cesium` exists)
 2. **Use jsDelivr CDN** for any Cesium
 3. **Test on local server** before GitHub Pages
 4. **Check browser console** for errors

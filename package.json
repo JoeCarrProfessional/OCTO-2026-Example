@@ -1,0 +1,24 @@
+{
+  "name": "octo-2026-example",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "description": "OCTO 2026 example project: live satellite tracker built with CesiumJS, React and Bentley's StrataKit design system",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mui/material": "^9.4.0",
+    "@stratakit/foundations": "^1.0.5",
+    "@stratakit/icons": "^0.4.6",
+    "@stratakit/mui": "^1.2.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.0"
+  }
+}

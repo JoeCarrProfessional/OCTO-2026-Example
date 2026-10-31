@@ -15,29 +15,36 @@
 git clone https://github.com/YOUR-USERNAME/my-satellite-tracker.git
 cd my-satellite-tracker
 
-# Copy your project files here
-# (your index.html, styles.css, app.js, etc.)
-
-# Add all files
+# Copy your project files here, then:
 git add .
-
-# Commit
 git commit -m "Initial commit: satellite tracker"
-
-# Push to GitHub
 git push origin main
 ```
 
+> **Tip:** the quickest route is to **fork this example repo** instead. It
+> already contains the deploy workflow, so you only need Step 3.
+
 ### Step 3: Enable GitHub Pages
-1. Go to your repository on GitHub
-2. Click **Settings** (top right)
-3. Scroll down to **Pages** (left sidebar)
-4. Under "Build and deployment":
-   - Set **Source** to `Deploy from a branch`
-   - Set **Branch** to `main` (or `master`)
-   - Click **Save**
-5. Wait 1-2 minutes
-6. Your site is now live at: `https://YOUR-USERNAME.github.io/my-satellite-tracker`
+
+There are two ways, depending on whether your project needs a build step.
+
+**A. Your project has a build step (React/Vite, like this example)**
+
+1. Make sure `.github/workflows/deploy.yml` from this repo is in your repo.
+2. Go to **Settings → Pages**.
+3. Under "Build and deployment" set **Source** to **GitHub Actions**.
+4. Push to `main` (or re-run the workflow from the **Actions** tab).
+5. Wait for the green tick (1–2 min). Your site is live at
+   `https://YOUR-USERNAME.github.io/my-satellite-tracker/`.
+
+Every later push to `main` rebuilds and redeploys automatically.
+
+**B. Your project is plain HTML/CSS/JS (no `npm run build`)**
+
+1. Go to **Settings → Pages**.
+2. Under "Build and deployment" set **Source** to **Deploy from a branch**,
+   branch `main`, folder `/ (root)`. Click **Save**.
+3. Wait 1–2 minutes. Same URL as above.
 
 ### Step 4: Submit to OCTO 2026
 Fill out the Microsoft Form with:
@@ -60,13 +67,17 @@ Done! 🎉
 - Look for errors in the **Deployments** tab
 
 ### "I see a 404"
-- Make sure your `index.html` is in the root of the repository
-- Or if it's in a folder, update Pages source to that folder
+- Build-step projects: check the **Actions** tab for a failed run, and confirm
+  Pages **Source** is set to **GitHub Actions**
+- Plain-static projects: make sure `index.html` is in the root of the repository
+  (or point the Pages folder setting at the right subfolder)
+- Assets 404 but the page loads: paths must be relative (`./assets/...`) or
+  Vite's `base` must be `'./'`, because your site lives under `/repo-name/`
 
 ### "JavaScript isn't working"
-- Open browser console (F12)
-- Check for errors (red text)
-- Make sure `index.html`, `styles.css`, and `app.js` are all present
+- Open browser console (F12) and look for errors (red text)
+- Run `npm run build && npm run preview` locally; if it works there but not on
+  Pages, it's almost always a path/`base` problem (see "I see a 404")
 
 ### "Cesium isn't loading"
 - Check your internet connection
@@ -85,8 +96,7 @@ my-username.github.io/
 └── projects/
     └── satellite-tracker/
         ├── index.html
-        ├── styles.css
-        └── app.js
+        └── assets/   (built output, or your own css/js)
 ```
 
 Then set Pages source to `/ (root)` and your site is at:
@@ -127,19 +137,18 @@ GitHub Pages automatically provides HTTPS for `.github.io` domains. ✅
 
 ### Iterate During the Hackathon
 ```bash
-# Make changes locally
-# Edit index.html, app.js, etc.
+# Make changes locally with hot reload
+npm run dev
+# Open http://localhost:5173
 
-# Test with local server
-python -m http.server 8000
-# Open http://localhost:8000
+# (plain-static projects: python -m http.server 8000 instead)
 
 # When happy, push to GitHub
 git add .
 git commit -m "Add satellite trails feature"
 git push origin main
 
-# Changes are live in ~30 seconds!
+# The Actions workflow rebuilds; changes are live in ~1-2 minutes
 ```
 
 ---
@@ -147,6 +156,8 @@ git push origin main
 ## Resources
 
 - **GitHub Pages Docs:** https://docs.github.com/en/pages
+- **Vite static deploy guide:** https://vite.dev/guide/static-deploy#github-pages
+- **StrataKit:** https://stratakit.bentley.com
 - **CesiumJS Demos:** https://sandcastle.cesium.com/
 - **Markdown Guide:** https://www.markdownguide.org/
 

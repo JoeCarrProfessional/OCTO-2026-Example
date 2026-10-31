@@ -1,0 +1,142 @@
+/* Layout and the few custom styles that StrataKit components don't cover.
+   Colours, spacing and radii come from StrataKit design tokens. */
+
+html,
+body,
+#root,
+.app-root {
+  height: 100%;
+  margin: 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  height: 100%;
+  background: var(--stratakit-color-bg-page-base);
+  color: var(--stratakit-color-text-neutral-primary);
+}
+
+.sidebar {
+  overflow-y: auto;
+  border-inline-end: 1px solid var(--stratakit-color-border-neutral-muted);
+  background: var(--stratakit-color-bg-elevation-base);
+}
+
+.sidebar-content {
+  padding: var(--stratakit-space-500);
+}
+
+.section-title {
+  margin-block-end: var(--stratakit-space-200);
+}
+
+.button-row {
+  margin-block-start: var(--stratakit-space-300);
+}
+
+.muted {
+  color: var(--stratakit-color-text-neutral-secondary);
+}
+
+.footer {
+  display: block;
+}
+
+.main {
+  position: relative;
+  min-width: 0;
+}
+
+.globe {
+  position: absolute;
+  inset: 0;
+}
+
+.overlay {
+  position: absolute;
+  top: var(--stratakit-space-400);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--stratakit-space-300) var(--stratakit-space-500);
+  border-radius: var(--stratakit-radius-md);
+  background: var(--stratakit-color-bg-elevation-overlay);
+  box-shadow: var(--stratakit-shadow-surface-md);
+}
+
+.legend {
+  position: absolute;
+  bottom: var(--stratakit-space-500);
+  left: var(--stratakit-space-500);
+  margin: 0;
+  padding: var(--stratakit-space-300) var(--stratakit-space-400);
+  list-style: none;
+  display: grid;
+  gap: var(--stratakit-space-150);
+  background: var(--stratakit-color-bg-elevation-overlay);
+}
+
+.legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--stratakit-radius-round);
+  border: 1px solid var(--stratakit-color-border-neutral-base);
+}
+
+.info-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--stratakit-space-2);
+}
+
+.info-card {
+  padding: var(--stratakit-space-400);
+}
+
+.category-chip {
+  margin-block-start: var(--stratakit-space-100);
+  border-inline-start: 4px solid var(--category-color);
+}
+
+.details {
+  margin: var(--stratakit-space-300) 0;
+  display: grid;
+  gap: var(--stratakit-space-100);
+}
+
+.details-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--stratakit-space-300);
+}
+
+.details-row dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.debug-log {
+  max-height: 160px;
+  overflow: auto;
+  margin: var(--stratakit-space-200) 0 0;
+  padding: var(--stratakit-space-200);
+  font-family: var(--stratakit-font-family-mono);
+  font-size: var(--stratakit-font-size-mono-sm);
+  white-space: pre-wrap;
+  border: 1px solid var(--stratakit-color-border-neutral-muted);
+  border-radius: var(--stratakit-radius-sm);
+  background: var(--stratakit-color-bg-page-depth);
+}
+
+@media (max-width: 760px) {
+  .layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  .sidebar {
+    max-height: 45vh;
+    border-inline-end: 0;
+    border-block-end: 1px solid var(--stratakit-color-border-neutral-muted);
+  }
+}

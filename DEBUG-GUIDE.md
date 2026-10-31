@@ -127,4 +127,4 @@ If the app doesn't work:
 **For Developers:**
 - All logging goes to `window.APP_LOGS` array
 - Errors stored in `window.APP_ERRORS` array
-- Check `app.js` for implementation details
+- See `src/lib/log.js` for the implementation

@@ -51,11 +51,31 @@ When you click a satellite, see:
 | Technology | Purpose | Why It's Great |
 |-----------|---------|-----------------|
 | **CesiumJS** | 3D globe & visualization | Bentley tech, WebGL, no backend needed |
+| **StrataKit** | UI components & theming | Bentley's open-source (MIT) design system, built on React 19 + MUI |
+| **React + Vite** | App framework & build | Fast dev server, one command to build for GitHub Pages |
 | **CelesTrak API** | Satellite data | Free, real-time, 3000+ satellites |
-| **HTML5/CSS3/JS** | Frontend | Lightweight, runs in browser |
-| **GitHub Pages** | Hosting | Free, built-in to GitHub, zero config |
+| **GitHub Pages + Actions** | Hosting | Free; every push to `main` rebuilds and redeploys |
 
-**Total dependencies:** 0 npm packages. Pure vanilla JavaScript.
+Cesium is loaded from a CDN (`<script>` tag in `index.html`) so you don't have to
+bundle its workers and assets. Everything else is plain npm.
+
+### About StrataKit
+
+[StrataKit](https://stratakit.bentley.com) is Bentley's design system. You get
+consistent, accessible, good-looking components for free by wrapping your app
+in `<Root>` from `@stratakit/mui` and then using normal `@mui/material`
+components (`Button`, `TextField`, `Checkbox`, `Paper`, …). Icons come from
+`@stratakit/icons`. Design tokens are plain CSS variables
+(`--stratakit-color-bg-page-base`, `--stratakit-space-4`, …) you can use in your
+own CSS.
+
+If you build with an AI coding agent, install the StrataKit usage skill so it
+knows the rules (e.g. use `render={<h1 />}` instead of MUI's `component` prop,
+don't mix in Tailwind/shadcn/iTwinUI):
+
+```bash
+gh skill install iTwin/stratakit stratakit-usage
+```
 
 ---
 
@@ -63,80 +83,68 @@ When you click a satellite, see:
 
 ```
 example-project/
-├── index.html          # Main HTML page
-├── styles.css          # Styling (dark theme, sidebar, legend)
-├── app.js              # Main application logic
-├── scripts/
-│   └── screenshot.py   # Headless-Chrome smoke test (console log + screenshot)
-├── README.md           # This file
-└── .gitignore         # (Git ignore patterns)
+├── index.html                  # HTML shell: loads Cesium from CDN, mounts React
+├── vite.config.js              # Vite config (base: './' so it works at any Pages URL)
+├── package.json
+├── public/
+│   └── data/tle-snapshot.txt   # Offline fallback TLE data (copied to dist/ as-is)
+├── src/
+│   ├── main.jsx                # Entry: StrataKit <Root colorScheme="dark"> → <App/>
+│   ├── App.jsx                 # State: satellites, filters, search, selection
+│   ├── App.css                 # Layout using StrataKit tokens
+│   ├── globe/
+│   │   └── SatelliteGlobe.jsx  # Owns the Cesium viewer; entities, orbits, picking
+│   ├── components/
+│   │   ├── Sidebar.jsx         # Filters, search, stats, debug log (MUI + StrataKit)
+│   │   ├── SatelliteInfo.jsx   # Details card for the selected satellite
+│   │   ├── Legend.jsx
+│   │   └── DebugLog.jsx
+│   └── lib/
+│       ├── tle.js              # Pure functions: parse TLE, SGP4 position, classify
+│       ├── dataSources.js      # CelesTrak → mirror → snapshot → demo fallback chain
+│       └── log.js              # In-app log that also feeds the debug panel
+└── .github/workflows/deploy.yml  # Builds with Vite and deploys to GitHub Pages
 ```
-
-**Lines of code:**
-- `index.html`: ~140 lines (well-commented semantic HTML)
-- `styles.css`: ~280 lines (organized sections with comments)
-- `app.js`: ~320 lines (modular functions, clear logic)
-- **Total: ~740 lines** (surprisingly compact for this functionality!)
 
 ---
 
 ## 🔧 Installation & Setup
 
-### Option 1: Run Locally (Quick Preview)
+You need [Node.js](https://nodejs.org) 18 or newer (20 LTS recommended).
+
+### Run locally
 
 ```bash
-# Clone or download the project
-cd example-project
-
-# Start a simple HTTP server (Python 3)
-python -m http.server 8000
-
-# Or use Node.js http-server
-npx http-server
-
-# Open in browser
-# http://localhost:8000
+git clone https://github.com/joecarrprofessional/OCTO-2026-Example.git
+cd OCTO-2026-Example
+npm install        # first time only
+npm run dev        # dev server with hot reload → http://localhost:5173
 ```
 
-### Option 2: Deploy to GitHub Pages
+Edit anything under `src/` and the browser updates instantly.
 
-1. **Create a GitHub repository** (e.g., `my-satellite-tracker`)
-
-2. **Copy project files** into your repo root (or in a subfolder)
-
-3. **Push to GitHub**
-   ```bash
-   git add .
-   git commit -m "Add satellite tracker"
-   git push origin main
-   ```
-
-4. **Enable GitHub Pages**
-   - Go to repo **Settings** → **Pages**
-   - Set source to `main` branch (or subfolder)
-   - Your site will be live at `https://username.github.io/my-satellite-tracker`
-
-5. **Share the link!**
-   ```
-   https://username.github.io/my-satellite-tracker
-   ```
-
-### Option 3: Let your AI assistant test it (headless screenshot)
-
-If you're building with an AI coding agent, give it a way to *see* the page
-instead of guessing. `scripts/screenshot.py` loads the app in headless Chrome,
-waits for satellites to appear, and prints the browser console, any page errors,
-where each satellite landed on screen, and the path to a PNG screenshot.
+### Build and preview the production bundle
 
 ```bash
-pip install pyppeteer                  # drives Chrome over DevTools protocol, no Node needed
-python -m http.server 8765 &           # serve the app
-cd scripts && python3 -m screenshot http://localhost:8765/ 30
+npm run build      # outputs static files to dist/
+npm run preview    # serves dist/ locally → http://localhost:4173
 ```
 
-Set `CHROME_BIN` if Chrome isn't at `/usr/bin/google-chrome`, and
-`SCREENSHOT_DIR` to change where PNGs go. Exit code is non-zero on JS errors,
-so it also works as a CI check.
+`dist/` is what GitHub Pages serves. It's git-ignored; the Actions workflow
+builds it for you.
+
+### Deploy to GitHub Pages
+
+1. **Fork** (or copy) this repo on GitHub.
+2. In your repo go to **Settings → Pages** and under **Build and deployment**
+   set **Source** to **GitHub Actions** (not "Deploy from a branch").
+3. Push to `main`. The workflow in `.github/workflows/deploy.yml` runs
+   `npm ci && npm run build` and publishes `dist/`. Watch it under the
+   **Actions** tab; first deploy takes a minute or two.
+4. Your site is live at `https://<username>.github.io/<repo-name>/`.
+
+Because `vite.config.js` sets `base: './'`, you don't need to change anything
+when you rename the repo.
 
 ---
 
@@ -147,25 +155,24 @@ so it also works as a CI check.
 ```
 CelesTrak API (3000+ active satellites)
          ↓
-    Parse TLE (Two-Line Elements)
+    Parse TLE (Two-Line Elements)            src/lib/tle.js
          ↓
-    Sgp4 Orbit Propagation (calculate position)
+    SGP4 orbit propagation (position now)    src/lib/tle.js
          ↓
-    CesiumJS 3D Visualization
+    React state (filters, search, selection) src/App.jsx
          ↓
-    Interactive WebGL Globe (run in browser)
+    CesiumJS entities on a 3D globe          src/globe/SatelliteGlobe.jsx
 ```
 
-### Key Functions
+### Key Pieces
 
-| Function | Purpose |
-|----------|---------|
-| `fetchSatelliteData()` | Downloads TLE data from CelesTrak |
-| `classifySatellite()` | Categorizes satellites (GPS, weather, etc.) |
-| `getSatellitePosition()` | Uses SGP4 math to calculate current position |
-| `createSatelliteEntity()` | Creates Cesium entity for 3D rendering |
-| `applyFilters()` | Filters & re-renders on category/search |
-| `showSatelliteInfo()` | Displays details when clicking satellite |
+| Where | What it does |
+|-------|--------------|
+| `lib/dataSources.js` → `loadTleText()` | Tries CelesTrak, then a mirror, then the bundled snapshot; caches in `localStorage` for 2 h |
+| `lib/tle.js` → `parseTle()`, `classifySatellite()` | Parses TLEs, derives orbital elements, buckets into GPS / Comms / Weather / ISS / Other |
+| `lib/tle.js` → `getSatellitePosition()`, `describeSatellite()` | SGP4 position in metres; live altitude and speed for the info card |
+| `globe/SatelliteGlobe.jsx` | Creates the Cesium viewer once, rebuilds entities when the filtered list changes, updates positions every 2 s, handles clicks |
+| `components/Sidebar.jsx` | All the controls, built from MUI components themed by StrataKit |
 
 ---
 
@@ -229,8 +236,8 @@ The two lines encode the satellite's orbital elements. This demo uses a simplifi
 ### Easy Wins (1-2 hours)
 
 - **Add more info:** Launch date, country of origin, TLE epoch (look up in TLE fields)
-- **Color scheme:** Edit `categoryColors` in `app.js`
-- **More categories:** Add to `classifySatellite()` function
+- **Color scheme:** Edit `CATEGORY_COLORS` in `src/lib/tle.js`
+- **More categories:** Add to `classifySatellite()` in `src/lib/tle.js`
 - **Ground tracks:** Draw satellite path on Earth surface (CesiumJS polyline)
 
 ### Medium Enhancements (3-5 hours)
@@ -292,9 +299,9 @@ The two lines encode the satellite's orbital elements. This demo uses a simplifi
 - Check that JavaScript is enabled
 
 ### "Globe doesn't load"
-- Cesium Ion token in `app.js` may be rate-limited
-- Generate your own free token at https://cesium.com/ion/
-- Replace `Cesium.Ion.defaultAccessToken` value
+- Check the browser console (F12) for a WebGL or CDN error
+- Make sure the Cesium `<script>` tag in `index.html` loaded (network tab)
+- Try a different browser; some corporate VPNs block CDNs
 
 ### "Very slow performance"
 - Too many satellites (3000+ can strain older GPUs)
@@ -339,6 +346,7 @@ The two lines encode the satellite's orbital elements. This demo uses a simplifi
 This project is in the **public domain** — free to use, modify, and share.
 
 - **CesiumJS:** Apache 2.0
+- **StrataKit / MUI / React:** MIT
 - **CelesTrak Data:** Public domain
 - **This code:** Public domain (do whatever you want!)
 
@@ -360,7 +368,7 @@ Have ideas? Found a bug? Want to extend this?
 This example shows you **what's possible** in 2-3 weeks with:
 
 - ✨ A compelling idea
-- 🔧 Free, open-source tools (CesiumJS)
+- 🔧 Free, open-source tools (CesiumJS, StrataKit)
 - 📊 Free, public data (CelesTrak)
 - 🚀 Confident deployment (GitHub Pages)
 - 🤖 AI assistance (GitHub Copilot)

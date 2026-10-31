@@ -16,29 +16,33 @@ This folder contains a **complete, working example** of what OCTO 2026 participa
 
 | File | Purpose | Size |
 |------|---------|------|
-| `index.html` | Main page structure | 4.6 KB |
-| `styles.css` | Dark theme styling | 5.8 KB |
-| `app.js` | Satellite tracking logic | 12 KB |
-| `README.md` | Complete documentation | 11 KB |
-| `DEPLOYMENT.md` | Step-by-step GitHub Pages guide | 3.8 KB |
-| `.gitignore` | Standard Git ignore patterns | 259 B |
+| `index.html` | Page shell; loads Cesium from CDN, mounts React | |
+| `src/App.jsx`, `src/App.css` | App state and layout (StrataKit tokens) | |
+| `src/globe/SatelliteGlobe.jsx` | CesiumJS globe, entities, picking | |
+| `src/components/*.jsx` | Sidebar, info card, legend, debug log (MUI + StrataKit) | |
+| `src/lib/tle.js` | TLE parsing, SGP4 positions, classification | |
+| `src/lib/dataSources.js` | Data fetch with fallbacks + cache | |
+| `.github/workflows/deploy.yml` | Build & deploy to GitHub Pages | |
+| `README.md` | Complete documentation | |
+| `DEPLOYMENT.md` | Step-by-step GitHub Pages guide | |
 
-**Total: ~40 KB** — Easily fits in any GitHub Pages repository
+**Total: ~1,000 lines of app code** — small enough to read in an afternoon
 
 ---
 
 ## How to Use This as Reference
 
 ### 1. **Learn from the Code**
-   - Open `app.js` — See how to use CesiumJS
-   - Open `styles.css` — Study the dark theme design
+   - Open `src/globe/SatelliteGlobe.jsx` — See how to use CesiumJS from React
+   - Open `src/components/Sidebar.jsx` — See StrataKit/MUI components in use
+   - Open `src/App.css` — Study how StrataKit design tokens drive the layout
    - Read the comments — Each section explains its purpose
    - **Takeaway:** This is how professional satellite tracking code looks
 
 ### 2. **Use as a Template**
    - Copy the project structure for your own idea
    - Reuse the HTML/CSS layout (adapt for your data)
-   - Adapt the filter/search patterns in `app.js`
+   - Adapt the filter/search patterns in `src/App.jsx`
    - **Takeaway:** Steal this design pattern!
 
 ### 3. **Understand Deployment**

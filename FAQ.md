@@ -5,7 +5,7 @@
 ### Q: Do I need to know JavaScript to modify this?
 **A:** Not deeply! You can:
 - Change colors (CSS)
-- Add/remove features (copy-paste patterns from app.js)
+- Add/remove features (copy-paste patterns from `src/`)
 - Use ChatGPT/Copilot to explain confusing code
 - Follow the examples in this project
 
@@ -29,7 +29,7 @@
 **A:** The algorithm that calculates satellite positions from orbital elements (TLE). CesiumJS handles it internally; you just feed it the TLE.
 
 ### Q: How often is satellite data updated?
-**A:** CelesTrak updates daily. The tracker refetches data every 60 seconds. You can change this: `setInterval(..., 60000)` in app.js.
+**A:** CelesTrak updates daily. The tracker fetches once on load (cached for 2 h in `localStorage`, see `src/lib/dataSources.js`) and recomputes positions every 2 seconds.
 
 ### Q: Can I track private satellites?
 **A:** Only NORAD-tracked satellites (~3,000 active). There are 100,000+ pieces of space debris not included.
@@ -117,25 +117,17 @@
 ## Customization Questions
 
 ### Q: How do I change the colors?
-**A:** Edit `categoryColors` in `app.js` (line ~38):
-```javascript
-let categoryColors = {
-    gps: Cesium.Color.fromCssColorString('#FF6B6B'),        // Change this
-    communication: Cesium.Color.fromCssColorString('#4ECDC4'),
-    // ...
-};
-```
-
-Or use color names: `'red'`, `'blue'`, `'#FF0000'`, `'rgb(255, 0, 0)'`
+**A:** Edit `CATEGORY_COLORS` in `src/lib/tle.js`. The values are CSS colour
+strings and are used for both the Cesium points and the legend/chips.
 
 ### Q: How do I add more satellite categories?
-**A:** Add to `classifySatellite()` function in app.js (line ~41):
+**A:** Add to `classifySatellite()` in `src/lib/tle.js`:
 ```javascript
 if (upper.includes('HUBBLE')) return 'observatory';
 if (upper.includes('ASTEROID')) return 'tracking';
 ```
 
-Then add to `categoryColors` and HTML checkboxes.
+Then add the new key to `CATEGORIES` and `CATEGORY_COLORS` in the same file; the sidebar checkboxes and legend are generated from those.
 
 ### Q: How do I change the satellite data source?
 **A:** Replace the fetch URL in `fetchSatelliteData()` (line ~80):
