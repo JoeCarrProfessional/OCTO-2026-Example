@@ -57,12 +57,15 @@ export default function Sidebar({
   return (
     <aside className="sidebar">
       <Stack spacing={3} className="sidebar-content">
-        <header>
-          <Typography variant="h5" render={<h1 />}>
-            🛰️ Satellite Tracker
+        <header className="app-header">
+          <Typography variant="h3" render={<h1 />} className="app-title">
+            <span aria-hidden="true">🛰️</span> Satellite Tracker
           </Typography>
-          <Typography variant="body2" className="muted">
-            Live view of orbiting satellites · OCTO 2026 example project
+          <Typography variant="body1" className="muted">
+            Live view of orbiting satellites
+          </Typography>
+          <Typography variant="caption" className="muted">
+            OCTO 2026 example project
           </Typography>
         </header>
 
@@ -89,10 +92,12 @@ export default function Sidebar({
             ))}
           </FormGroup>
           <Tooltip title={denseMode ? `Above ${DETAIL_LIMIT} satellites, orbits are drawn only for the selected one` : ''}>
-            <FormControlLabel
-              label={denseMode ? 'Show orbit paths (selected only)' : 'Show orbit paths'}
-              control={<Switch checked={showOrbits} onChange={(e) => onShowOrbitsChange(e.target.checked)} />}
-            />
+            <div className="orbit-toggle">
+              <FormControlLabel
+                label={denseMode ? 'Show orbit paths (selected only)' : 'Show orbit paths'}
+                control={<Switch checked={showOrbits} onChange={(e) => onShowOrbitsChange(e.target.checked)} />}
+              />
+            </div>
           </Tooltip>
         </section>
 
@@ -140,16 +145,21 @@ export default function Sidebar({
 
         <DebugLog />
 
-        <Typography variant="caption" className="muted footer">
-          Data: {status.source ? status.source.replace(/^https?:\/\//, '').split('/')[0] : 'CelesTrak'} · Built with{' '}
-          <Link href="https://cesium.com/" target="_blank" rel="noreferrer">
-            CesiumJS
-          </Link>{' '}
-          and{' '}
-          <Link href="https://stratakit.bentley.com/" target="_blank" rel="noreferrer">
-            StrataKit
-          </Link>
-        </Typography>
+        <footer className="footer">
+          <Typography variant="caption" className="muted" render={<p />}>
+            Data: {describeSource(status.source)}
+          </Typography>
+          <Typography variant="caption" className="muted" render={<p />}>
+            Built with{' '}
+            <Link href="https://cesium.com/" target="_blank" rel="noreferrer">
+              CesiumJS
+            </Link>{' '}
+            and{' '}
+            <Link href="https://stratakit.bentley.com/" target="_blank" rel="noreferrer">
+              StrataKit
+            </Link>
+          </Typography>
+        </footer>
       </Stack>
     </aside>
   );
@@ -166,4 +176,11 @@ function Stat({ label, value }) {
       </Typography>
     </div>
   );
+}
+
+function describeSource(source) {
+  if (!source) return 'CelesTrak';
+  if (/^https?:\/\//.test(source)) return source.replace(/^https?:\/\//, '').split('/')[0];
+  if (source.startsWith('built-in')) return source;
+  return 'bundled snapshot (offline)';
 }

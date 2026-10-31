@@ -31,6 +31,27 @@ body,
   margin-block-end: var(--stratakit-space-200);
 }
 
+.app-header {
+  display: grid;
+  gap: var(--stratakit-space-50);
+}
+
+/* StrataKit's theme pins MUI heading variants to its own scale, so the page
+   title opts into the larger "headline" step explicitly. */
+.app-title {
+  margin: 0;
+  margin-block-end: var(--stratakit-space-100);
+  font-size: var(--stratakit-font-size-headline-lg);
+  line-height: var(--stratakit-line-height-headline-lg);
+  font-weight: 600;
+}
+
+.orbit-toggle {
+  margin-block-start: var(--stratakit-space-400);
+  padding-block-start: var(--stratakit-space-300);
+  border-block-start: 1px solid var(--stratakit-color-border-neutral-muted);
+}
+
 .button-row {
   margin-block-start: var(--stratakit-space-300);
 }
@@ -40,7 +61,12 @@ body,
 }
 
 .footer {
-  display: block;
+  display: grid;
+  gap: var(--stratakit-space-100);
+}
+
+.footer p {
+  margin: 0;
 }
 
 .main {
@@ -64,10 +90,12 @@ body,
   box-shadow: var(--stratakit-shadow-surface-md);
 }
 
+/* Top-right so it never covers Cesium's credit (bottom-left) or the
+   fullscreen button (bottom-right). */
 .legend {
   position: absolute;
-  bottom: var(--stratakit-space-500);
-  left: var(--stratakit-space-500);
+  top: var(--stratakit-space-500);
+  right: var(--stratakit-space-500);
   margin: 0;
   padding: var(--stratakit-space-300) var(--stratakit-space-400);
   list-style: none;
@@ -81,6 +109,36 @@ body,
   height: 12px;
   border-radius: var(--stratakit-radius-round);
   border: 1px solid var(--stratakit-color-border-neutral-base);
+}
+
+/* Bottom-right, to the left of Cesium's fullscreen button. */
+.stratakit-badge {
+  position: absolute;
+  right: 48px;
+  bottom: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--stratakit-space-100);
+  padding: var(--stratakit-space-100) var(--stratakit-space-200);
+  border-radius: var(--stratakit-radius-md);
+  color: var(--stratakit-color-text-neutral-primary);
+  background: var(--stratakit-color-bg-elevation-overlay);
+  box-shadow: var(--stratakit-shadow-surface-md);
+  font-size: var(--stratakit-font-size-caption-md);
+  text-decoration: none;
+}
+
+.stratakit-badge:hover {
+  text-decoration: underline;
+}
+
+/* Masked so the mark takes the current text colour in light or dark theme. */
+.stratakit-mark {
+  width: 20px;
+  height: 20px;
+  background-color: currentColor;
+  mask: var(--logo) center / contain no-repeat;
+  -webkit-mask: var(--logo) center / contain no-repeat;
 }
 
 .info-header {

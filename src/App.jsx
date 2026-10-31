@@ -3,6 +3,7 @@ import { Alert, CircularProgress, Stack, Typography } from '@mui/material';
 import SatelliteGlobe from './globe/SatelliteGlobe.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import Legend from './components/Legend.jsx';
+import StrataKitBadge from './components/StrataKitBadge.jsx';
 import { CATEGORIES, parseTle } from './lib/tle.js';
 import { loadTleText } from './lib/dataSources.js';
 import { logApp } from './lib/log.js';
@@ -83,6 +84,7 @@ export default function App() {
           onSelect={setSelectedId}
         />
         <Legend />
+        <StrataKitBadge />
         {status.state === 'loading' && (
           <Stack className="overlay" direction="row" spacing={2} alignItems="center">
             <CircularProgress size={20} />
