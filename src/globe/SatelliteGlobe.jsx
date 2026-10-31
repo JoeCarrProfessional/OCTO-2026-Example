@@ -5,6 +5,7 @@ import { logApp } from '../lib/log.js';
 // Above this many satellites, orbit rings and labels are drawn only for the selected one.
 export const DETAIL_LIMIT = 300;
 const GEO_RADIUS_M = 42164000;
+const IDLE_SPIN_RAD_PER_S = 0.08; // one revolution in ~80 seconds
 
 // Owns the Cesium viewer. React tells it *what* to show (satellites, selection,
 // orbit toggle); it manages the entities imperatively for performance.
@@ -53,6 +54,30 @@ export default function SatelliteGlobe({ satellites, showOrbits, selectedId, onS
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
+    // Slow idle spin around Earth's axis until the user drags (zooming with the
+    // wheel or right-drag keeps spinning) or a satellite is selected.
+    const spin = { active: true, dragFrom: null, lastMs: performance.now() };
+    const onSpin = (scene) => {
+      const now = performance.now();
+      const seconds = Math.min((now - spin.lastMs) / 1000, 0.1); // clamp after tab was hidden
+      spin.lastMs = now;
+      if (spin.active) scene.camera.rotate(Cesium.Cartesian3.UNIT_Z, -IDLE_SPIN_RAD_PER_S * seconds);
+    };
+    viewer.scene.postUpdate.addEventListener(onSpin);
+    const stopSpin = () => {
+      if (spin.active) logApp('Idle spin stopped');
+      spin.active = false;
+    };
+    const handler = viewer.screenSpaceEventHandler;
+    handler.setInputAction((e) => { spin.dragFrom = e.position.clone(); }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
+    handler.setInputAction(() => { spin.dragFrom = null; }, Cesium.ScreenSpaceEventType.LEFT_UP);
+    handler.setInputAction((e) => {
+      // Only a real drag stops the spin; a plain click (to pick a satellite) does not.
+      if (spin.dragFrom && Cesium.Cartesian2.distance(spin.dragFrom, e.endPosition) > 4) stopSpin();
+    }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+    handler.setInputAction(stopSpin, Cesium.ScreenSpaceEventType.PINCH_START);
+    state.current.stopSpin = stopSpin;
+
     // Bulk position refresh: far cheaper than a CallbackProperty per entity.
     const timer = setInterval(() => {
       const s = state.current;
@@ -66,6 +91,7 @@ export default function SatelliteGlobe({ satellites, showOrbits, selectedId, onS
 
     return () => {
       clearInterval(timer);
+      viewer.scene.postUpdate.removeEventListener(onSpin);
       viewer.destroy();
       state.current = null;
     };
@@ -161,6 +187,7 @@ export default function SatelliteGlobe({ satellites, showOrbits, selectedId, onS
     ring.show = true;
     ring.polyline.width = 3;
     ring.polyline.material = color.withAlpha(0.9);
+    s.stopSpin?.();
     flyToSatellite(viewer, entity);
 
     return () => {
